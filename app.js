@@ -45,11 +45,12 @@ app.use((err, req, res, next) => {
     res.status(err.status)
     res.render("error");
 });
-
-// start the server, the port to serve the application on
-app.listen(3000, () => {
-    // log a string to the console that says which port the app is listening to.
-    console.log("Your application is now connected to port 3000!")
-});
-
 */
+// have sequelize be in sync with database
+sequelize.sync().then(() => {
+    // start the server, the port to serve the application on
+    app.listen(3000, () => {
+        console.log('Application running on localhost:3000');
+    });
+})
+

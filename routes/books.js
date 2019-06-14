@@ -1,14 +1,14 @@
-var express = require('express');
-var router = express.Router();
-var Book = require("../models").Book;
-var Sequelize = require('sequelize');
-var Op = Sequelize.Op;
+const express = require('express');
+const router = express.Router();
+const Book = require("../models").Book;
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
 
 
 /* Show the full list of books */
 router.get('/', function (req, res, next) { 
     Book.findAll({ order: [["Year", "DESC"]] }).then(function (books) {
-        res.render("books/index", { books: books, title: "Books" });
+        res.render("books/index", { books: books, title: "Full List of Books" });
     }).catch(function (error) {
         res.send(500, error)
     });
@@ -16,18 +16,18 @@ router.get('/', function (req, res, next) {
 
 
 /* Create a new book form */
-router.get('books/new', function(req, res, next){
-    res.render("books/new", { book: {}, title: "New Book"})
+router.get('/new-book', function(req, res, next){
+    res.render("books/new-book", { book: {}, title: "New Book" });
 });
 
 
 /* Post new books to database */
 router.post('/', function (req, res, next) { 
     Book.create(req.body).then(function (book) {
-        res.redirect("/books" + book.id);
+        res.redirect("/books/" + book.id);
     }).catch(function (error) {
         if (error.name === "SequelizeValidationError") {
-            res.render("books/new", {
+            res.render("books/new-book", {
                 book: Book.build(req.body),
                 title: "New Book",
                 error: error.errors
@@ -36,20 +36,35 @@ router.post('/', function (req, res, next) {
             throw error;
         }
     }).catch(function (error) {
-        res.send(500);
+        res.send(500, error);
     });
 });
 
 
-/* Delete article form */
-router.get('books/:id/delete', function (req, res, next) {
+/* Individual book details */
+router.get('/:id', function (req, res, next) {
     Book.findByPk(req.params.id).then((book) => {
         if (book) {
-            res.render('books/delete', { book: book, title: 'Delete Book' });
+            res.render('books/update-book', { book: book, title: book.title });
+        } else {
+            const err = new Error('Unable to find book');
+            res.render("error", { error: err });
+        }
+    }).catch((error) => {
+        res.send(500, error);
+    });
+});
+
+
+/* Update book information in database*/
+router.put('/:id', function (req, res, next) {
+    Book.findByPk(req.params.id).then((book) => {
+        if (book) {
+            return book.update(req.body);
         } else {
             res.send(404);
         }
-  });
+    });
 });
 
 
@@ -66,7 +81,7 @@ router.delete('/:id', function (req, res, next) {
   });
 });
 
-
+module.exports = router;
 
 
 /*

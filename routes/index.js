@@ -3,5 +3,7 @@ const router = express.Router();
 
 router.get('/', function (req, res, next) {
     console.log("books");
-    res.redirect('/books');
+    // res.redirect('/books');
 });
+
+module.exports = router;

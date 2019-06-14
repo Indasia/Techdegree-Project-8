@@ -22,13 +22,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 // app.use('/books', books);    
     
-//* GET
-
-// POST
-
-// NEW
-
-
 /* ERROR MIDDLEWARE */
 
 // create error middleware
@@ -54,16 +47,16 @@ app.use(function (err, req, res, next) {
 });
 
 //Start the server
-app.listen(3000, () => {
-    console.log('The server is running on port 3000.');
-});
-
-// // Set our port.
-// app.set('port', process.env.PORT || 5000);
-
-// // Start listening on our port.
-// const server = app.listen(app.get('port'), () => {
-//     console.log(`Express server is listening on port ${server.address().port}`);
+// app.listen(3000, () => {
+//     console.log('The server is running on port 3000.');
 // });
+
+// Set our port.
+app.set('port', process.env.PORT || 5000);
+
+// Start listening on our port.
+const server = app.listen(app.get('port'), () => {
+    console.log(`Express server is listening on port ${server.address().port}`);
+});
 
 module.exports = app;

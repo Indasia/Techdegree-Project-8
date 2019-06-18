@@ -1,12 +1,11 @@
-// require express
 const express = require("express");
 const path = require("path");
 const bodyParser = require("body-parser");
-const router = express.Router();
+const methodOverride = require("method-override");
+const cookieParser = require("cookie-parser");
+const morganLogger = require("morgan");
+const books = require("./routes/books");
 const routes = require("./routes/index");
-// require books route
-//  const books = require("./routes/books");
-
 
 // call express
 const app = express();
@@ -15,51 +14,36 @@ const app = express();
 /* MIDDLEWARE */
 // tell express to use pug
 app.set("view engine", "pug");
-app.set("views", path.join(__dirname, "views")); 
-app.use(express.static(path.join(__dirname, 'public')));
+app.set("views", path.join(__dirname, "views"));
+app.use(express.static(path.join(__dirname, "public")));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(methodOverride("_method"));
+app.use(morganLogger("dev"));
 
 
 /* ROUTES */
-app.use('/', routes);
-// app.use('/books', books);    
-    
+app.use("/", routes);
+app.use("/books", books);
 
-/* ERROR MIDDLEWARE */
+
+/* FOR ERRORS */
 // create error middleware
-app.use(function(req, res, next) {
-    // new "not found" error
-    const err = new Error("Uh oh! There's nothing to see here.");
-    // log error to console
-    console.log("Sorry, this page doesn't exist!");
-    // set error status to 404 status error
-    err.status = 404;
-    // pass errors to express error handler
-    next(err);
+/*
+app.use((req, res) => {
+    res.status(404).json({
+        message: "Not Found",
+    });
 });
+*/
 
-// check for errors and then when that is complete move on
 app.use(function (err, req, res, next) {
-    // if error status is 404, show the "page not found" page
     if (err.status === 404) {
         res.render("books/page-not-found");
     } else {
         res.render("errors", { error: err });
     }
-});
-
-
-//Start the server
-// app.listen(3000, () => {
-//     console.log('The server is running on port 3000.');
-// });
-
-
-// Set our port.
-app.set('port', process.env.PORT || 5000);
-
-// Start listening on our port.
-const server = app.listen(app.get('port'), () => {
-    console.log(`Express server is listening on port ${server.address().port}`);
 });
 
 

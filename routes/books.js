@@ -1,3 +1,4 @@
+// require...
 const express = require('express');
 const router = express.Router();
 const Book = require("../models").Book;
@@ -5,26 +6,26 @@ const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
 
-/* Show the full list of books */
-router.get('/', function (req, res, next) { 
-    Book.findAll({ order: [["Year", "DESC"]] }).then(function (books) {
-        res.render("books/index", { books: books, title: "Full List of Books" });
+/* Full book list - "GET" */
+router.get('/', function (req, res, next) { //shows the full list of books
+    Book.findAll({ order: [["Year", "DESC"]] }).then(function (book) {
+        res.render("books/index", { books: books, title: "Books" });
     }).catch(function (error) {
-        res.send(500, error)
+        res.status(500).json({ error: error.toString() });
     });
 });
 
 
-/* Create a new book form */
+/* Create a new book form - "GET" */
 router.get('/new-book', function(req, res, next){
     res.render("books/new-book", { book: {}, title: "New Book" });
 });
 
 
-/* Post new books to database */
+/* Posts new book to database - "POST" */
 router.post('/', function (req, res, next) { 
     Book.create(req.body).then(function (book) {
-        res.redirect("/books/" + book.id);
+        res.redirect("/books/" + book.id); // should I use book.id or just "/books/"?
     }).catch(function (error) {
         if (error.name === "SequelizeValidationError") {
             res.render("books/new-book", {
@@ -36,62 +37,62 @@ router.post('/', function (req, res, next) {
             throw error;
         }
     }).catch(function (error) {
-        res.send(500, error);
+        res.status(500).json({ error: error.toString() });
     });
 });
 
 
 /* Individual book details */
-router.get('/:id', function (req, res, next) {
-    Book.findByPk(req.params.id).then((book) => {
+router.get("/:id", function (req, res, next) { //books/:id - shows book detail form
+    Book.findByPk(req.params.id).then(function (book) {
         if (book) {
-            res.render('books/update-book', { book: book, title: book.title });
+            res.render("books/update-book", { book: book, title: book.title });
         } else {
-            const err = new Error('Unable to find book');
-            res.render("error", { error: err });
+            res.render("books/page-not-found", { book: {}, title: "Page Not Found" });
         }
-    }).catch((error) => {
-        res.send(500, error);
+    }).catch(function (error) {
+        res.status(500).json({ error: error.toString() });
     });
 });
 
 
-/* Update book information in database*/
-router.put('/:id', function (req, res, next) {
-    Book.findByPk(req.params.id).then((book) => {
+/* Update book information in database - "PUT" */
+router.put("/:id", function (req, res, next) { // post /books/:id - update book info in the database
+    Book.findByPk(req.params.id).then(function (book) {
         if (book) {
-            return book.update(req.body);
+            return book.update(req.body)
         } else {
-            res.send(404);
+            res.status(404).json({ error: error.toString() });
         }
+    }).then(function (book) {
+        res.redirect("/books"); // ?? ("/books/")
+    }).catch(function (error) {
+        if (error.name === "SequelizeValidationError") {
+            var book = Book.build(req.body);
+            book.id = req.params.id;
+            res.render("books/update-book", { book: book, title: "Update Book", errors: error.errors });
+        } else {
+            throw error
+        }
+    }).catch(function (error) {
+        res.status(500).json({ error: error.toString() });
     });
 });
 
-
-/* DELETE individual book */
-router.delete('/:id', function (req, res, next) {
-    Book.findByPk(req.params.id).then((book) => {
+/* "DELETE" individual books */
+router.delete("/:id", function (req, res, next) {
+    Book.findByPk(req.params.id).then(function (book) {
         if (book) {
             return book.destroy();
         } else {
-            res.send(404)
+            res.status(404).json({ error: error.toString() });;
         }
-  }).then(() => {
-    res.redirect('/books');
-  });
+    }).then(function () {
+        res.redirect("/books");
+    })
+        .catch(function (error) {
+            res.status(500).json({ error: error.toString() });
+        });
 });
 
 module.exports = router;
-
-
-/*
-get / - Home route should redirect to the /books route.
-X get /books - Shows the full list of books.
-X get /books/new - Shows the create new book form.
-X post /books/new - Posts a new book to the database.
-get /books/:id - Shows book detail form.
-post /books/:id - Updates book info in the database.
-X post /books/:id/delete - Deletes a book. Careful, this can’t be undone. It can be helpful to create a new “test” book to test deleting.
-Set up a custom error handler middleware function that logs the error to the console and renders an “Error” view with a friendly message for the user. This is useful if the server encounters an error, like trying to view the “Books Detail” page for a book :id that doesn’t exist. See the error.html file in the example-markup folder to see what this would look like.
-Set up a middleware function that returns a 404 NOT FOUND HTTP status code and renders a "Page Not Found" view when the user navigates to a non-existent route, such as /error. See the page_found.html file in the example markup folder for an example of what this would look like.
-*/

@@ -5,8 +5,8 @@ var http = require("http");
 var debug = require("debug")("express-sequelize");
 var models = require("../models"); 
 
-// whatever is in the environment variable PORT, or 3000 if theres nothing there. Store in Express
-var port = normalizePort(process.env.PORT || "3000");
+// whatever is in the environment variable PORT, or 5000 if theres nothing there. Store in Express
+var port = normalizePort(process.env.PORT || "5000");
 app.set("port", port);
 
 // create HTTP server

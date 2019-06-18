@@ -79,6 +79,7 @@ router.put("/:id", function (req, res, next) { // post /books/:id - update book 
     });
 });
 
+
 /* "DELETE" individual books */
 router.delete("/:id", function (req, res, next) {
     Book.findByPk(req.params.id).then(function (book) {
@@ -89,10 +90,10 @@ router.delete("/:id", function (req, res, next) {
         }
     }).then(function () {
         res.redirect("/books");
-    })
-        .catch(function (error) {
+    }).catch(function (error) {
             res.status(500).json({ error: error.toString() });
         });
 });
+
 
 module.exports = router;

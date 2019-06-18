@@ -1,15 +1,15 @@
 // require...
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 const Book = require("../models").Book;
-const Sequelize = require('sequelize');
+const Sequelize = require("sequelize");
 const Op = Sequelize.Op;
 
 
 /* Full book list - "GET" */
-router.get('/', function (req, res, next) { //shows the full list of books
-    Book.findAll({ order: [["Year", "DESC"]] }).then(function (book) {
-        res.render("books/index", { books: books, title: "Books" });
+router.get("/", function (req, res, next) { 
+    Book.findAll({ order: [["Year", "DESC"]] }).then(function (books) {
+        res.render("books/index", { books: books, title: "All Books" });
     }).catch(function (error) {
         res.status(500).json({ error: error.toString() });
     });
@@ -17,13 +17,13 @@ router.get('/', function (req, res, next) { //shows the full list of books
 
 
 /* Create a new book form - "GET" */
-router.get('/new-book', function(req, res, next){
+router.get("/new-book", function(req, res, next){
     res.render("books/new-book", { book: {}, title: "New Book" });
 });
 
 
 /* Posts new book to database - "POST" */
-router.post('/', function (req, res, next) { 
+router.post("/", function (req, res, next) { 
     Book.create(req.body).then(function (book) {
         res.redirect("/books/" + book.id); // should I use book.id or just "/books/"?
     }).catch(function (error) {
@@ -42,8 +42,8 @@ router.post('/', function (req, res, next) {
 });
 
 
-/* Individual book details */
-router.get("/:id", function (req, res, next) { //books/:id - shows book detail form
+/* Individual book details - "GET" */
+router.get("/:id", function (req, res, next) { 
     Book.findByPk(req.params.id).then(function (book) {
         if (book) {
             res.render("books/update-book", { book: book, title: book.title });
@@ -57,7 +57,7 @@ router.get("/:id", function (req, res, next) { //books/:id - shows book detail f
 
 
 /* Update book information in database - "PUT" */
-router.put("/:id", function (req, res, next) { // post /books/:id - update book info in the database
+router.put("/:id", function (req, res, next) {
     Book.findByPk(req.params.id).then(function (book) {
         if (book) {
             return book.update(req.body)
@@ -65,7 +65,7 @@ router.put("/:id", function (req, res, next) { // post /books/:id - update book 
             res.status(404).json({ error: error.toString() });
         }
     }).then(function (book) {
-        res.redirect("/books"); // ?? ("/books/")
+        res.redirect("/books");
     }).catch(function (error) {
         if (error.name === "SequelizeValidationError") {
             var book = Book.build(req.body);

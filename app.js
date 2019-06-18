@@ -14,7 +14,9 @@ const app = express();
 /* MIDDLEWARE */
 // tell express to use pug
 app.set("view engine", "pug");
+// set 'views' directory for any views
 app.set("views", path.join(__dirname, "views"));
+// require static assets from public folder
 app.use(express.static(path.join(__dirname, "public")));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));

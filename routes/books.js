@@ -10,7 +10,7 @@ const Op = Sequelize.Op;
 /* Full book list - "GET" */
 router.get('/', function (req, res, next) { 
     Book.findAll({ order: [["Year", "DESC"]] }).then(function (books) {
-        res.render('book/index', { books: books, title: "All Books" });
+        res.render('index', { books: books, title: "All Books" });
     }).catch(function (error) {
         res.status(500).json({ error: error.toString() });
     });

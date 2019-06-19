@@ -19,14 +19,14 @@ router.get('/', function (req, res, next) {
 
 /* Create a new book form - "GET" */
 router.get('/new-book', function(req, res, next){
-    res.render('books/new-book', { book: {}, title: "New Book" });
+    res.render('new-book', { book: {}, title: "New Book" });
 });
 
 
 /* Posts new book to database - "POST" */
 router.post('/', function (req, res, next) { 
     Book.create(req.body).then(function (book) {
-        res.redirect("/books/" + book.id); // should I use book.id or just "/books/"?
+        res.redirect("/books/"); // should I use book.id or just "/books/"?
     }).catch(function (error) {
         if (error.name === "SequelizeValidationError") {
             res.render('books/new-book', {
@@ -47,9 +47,9 @@ router.post('/', function (req, res, next) {
 router.get('/:id', function (req, res, next) { 
     Book.findByPk(req.params.id).then(function (book) {
         if (book) {
-            res.render('books/update-book', { book: book, title: book.title });
+            res.render('book/update-book', { book: book, title: book.title });
         } else {
-            res.render('page-not-found', { book: {}, title: "Page Not Found" });
+            res.render('book/page-not-found', { book: {}, title: "Page Not Found" });
         }
     }).catch(function (error) {
         res.status(500).json({ error: error.toString() });

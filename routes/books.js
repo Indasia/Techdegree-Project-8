@@ -47,9 +47,9 @@ router.post('/', function (req, res, next) {
 router.get('/:id', function (req, res, next) { 
     Book.findByPk(req.params.id).then(function (book) {
         if (book) {
-            res.render('book/update-book', { book: book, title: book.title });
+            res.render('update-book', { book: book, title: book.title });
         } else {
-            res.render('book/page-not-found', { book: {}, title: "Page Not Found" });
+            res.render('page-not-found', { book: {}, title: "Page Not Found" });
         }
     }).catch(function (error) {
         res.status(500).json({ error: error.toString() });
@@ -71,7 +71,7 @@ router.put('/:id', function (req, res, next) {
         if (error.name === "SequelizeValidationError") {
             var book = Book.build(req.body);
             book.id = req.params.id;
-            res.render('books/update-book', { book: book, title: "Update Book", errors: error.errors });
+            res.render('update-book', { book: book, title: "Update Book", errors: error.errors });
         } else {
             throw error
         }

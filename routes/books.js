@@ -26,13 +26,13 @@ router.get('/new-book', function(req, res, next){
 /* Posts new book to database - "POST" */
 router.post('/', function (req, res, next) { 
     Book.create(req.body).then(function (book) {
-        res.redirect("/books/"); // should I use book.id or just "/books/"?
+        res.redirect("/books/"); // should I use book.id or just "/books"?
     }).catch(function (error) {
         if (error.name === "SequelizeValidationError") {
-            res.render('books/new-book', {
+            res.render('new-book', {
                 book: Book.build(req.body),
                 title: "New Book",
-                error: error.errors
+                errors: error.errors
             });
         } else {
             throw error;

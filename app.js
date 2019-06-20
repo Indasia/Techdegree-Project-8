@@ -32,21 +32,19 @@ app.use('/books', books);
 
 /* FOR ERRORS */
 // create error middleware
-app.use((req, res) => {
-    res.status(404).json({
-        message: 'Not Found'
-    });
+app.use(function(err, res, next) {
+    let err = new Error("Page Not Found"); 
+    err.status = 404;
+    next(err);
 });
 
-
-/*
 app.use(function (err, req, res, next) {
     if (err.status === 404) {
-        res.render('books/page-not-found');
+        res.render('page-not-found');
     } else {
         res.render('errors', { error: err });
     }
 });
-*/
+
 
 module.exports = app;
